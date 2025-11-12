@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CYBER RIGS - Forge Your Reality</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+        /* Define colors based on the tailwind config */
+        :root {
+            --color-primary: #FAC638;
+            --color-background-dark: #231e0f;
+        }
+
+        .cyber-grid-bg {
+            background-image:
+                linear-gradient(rgba(4, 4, 3, 0.95), rgba(75, 75, 29, 0.95)),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f4f425' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .active-nav {
+            box-shadow: 0 2px 0 0 var(--color-primary), 0 -2px 0 0 var(--color-primary);
+        }
+
+        .component-list-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed rgba(244, 244, 37, 0.2);
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .loader {
+            border: 4px solid var(--color-primary);
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {primary: "#FAC638", "background-light": "#f8f8f5", "background-dark": "#231e0f"}, fontFamily: {display: "Space Grotesk"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+</head>
+<body class="font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden cyber-grid-bg">
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 sm:px-10 md:px-20 lg:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/20 px-4 md:px-10 py-3">
+<div class="flex items-center gap-4 text-white">
+<div class="size-6 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">P C <span class="text-primary">X</span> BUILDS</h2>
+</div>
+<div class="hidden md:flex flex-1 justify-end gap-8">
+<div class="flex items-center gap-9">
+<button onclick="showView('home')" class="nav-link text-white text-sm font-medium leading-normal hover:text-primary transition-colors active-nav" data-view="home">Home</button>
+<button onclick="showView('budget-builder')" class="nav-link text-white text-sm font-medium leading-normal hover:text-primary transition-colors" data-view="budget-builder">Budget Builder</button>
+<button onclick="showView('custom-builder')" class="nav-link text-white text-sm font-medium leading-normal hover:text-primary transition-colors" data-view="custom-builder">Custom Build</button>
+<button onclick="showView('community-builds')" class="nav-link text-white text-sm font-medium leading-normal hover:text-primary transition-colors" data-view="community-builds">Community</button>
+</div>
+
+</button>
+</div>
+</header>
+<main class="flex-grow">
+
+<!-- === Dynamic Content Container === -->
+<div id="app-container" class="space-y-12">
+
+    <!-- === VIEW: Home === -->
+    <div id="home" class="view-content active-view">
+        <div class="py-16 md:py-24 px-4 text-center">
+            <div class="flex flex-col gap-4">
+                <h1 class="text-white text-4xl md:text-5xl font-black leading-tight tracking-[-0.033em]">
+                    Forge Your Reality
+                </h1>
+                <h2 class="text-slate-300 text-sm md:text-base font-normal leading-normal">
+                    Build your next-gen rig with the best components on the market.
+                </h2>
+            </div>
+        </div>
+        <div class="@container">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
+
+            <!-- Budget Builder Card (Link) -->
+            <button onclick="showView('budget-builder')" class="block text-left">
+              <div class="group relative flex cursor-pointer flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-center transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <div class="flex justify-center text-primary">
+                  <span class="material-symbols-outlined !text-4xl">savings</span>
+                </div>
+                <h3 class="text-white text-xl font-bold">Budget Builder</h3>
+                <p class="text-slate-300 text-sm">Optimized performance for every price point (General Purpose).</p>
+              </div>
+            </button>
+
+            <!-- Community Builds Card (Link) -->
+            <button onclick="showView('community-builds')" class="block text-left">
+              <div class="group relative flex cursor-pointer flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-center transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <div class="flex justify-center text-primary">
+                  <span class="material-symbols-outlined !text-4xl">groups</span>
+                </div>
+                <h3 class="text-white text-xl font-bold">Community Builds</h3>
+                <p class="text-slate-300 text-sm">Explore and import builds from fellow creators.</p>
+              </div>
+            </button>
+
+            <!-- Custom Build Card (Link) -->
+            <button onclick="showView('custom-builder')" class="block text-left">
+              <div class="group relative flex cursor-pointer flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-center transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <div class="flex justify-center text-primary">
+                  <span class="material-symbols-outlined !text-4xl">memory_alt</span>
+                </div>
+                <h3 class="text-white text-xl font-bold">Custom Build</h3>
+                <p class="text-slate-300 text-sm">Total freedom. Select budget and purpose (Gaming/Productivity).</p>
+              </div>
+            </button>
+
+          </div>
+        </div>
+        
+
+
+    <!-- === VIEW: 1. Budget Builder (General Purpose) === -->
+    <div id="budget-builder" class="view-content hidden p-4 sm:p-6 space-y-8">
+        <h2 class="text-3xl font-bold text-white leading-tight tracking-[-0.033em] border-b border-primary/30 pb-4">
+            1. BUDGET BUILDER <span class="text-primary">(GENERAL USE)</span>
+        </h2>
+        
+        <div class="bg-primary/10 p-6 rounded-lg border border-primary/30 shadow-xl" style="box-shadow: 0 0 10px rgba(244, 244, 37, 0.1);">
+            <p class="text-slate-300 mb-6">Enter your maximum budget in INR. We'll find the best all-around PC that fits.</p>
+            
+            <form id="general-build-form" onsubmit="event.preventDefault(); submitGeneralBuild();" class="space-y-6">
+                <label for="general-budget" class="block text-sm font-medium text-primary">BUDGET (₹)</label>
+                <input type="number" id="general-budget" required min="1000" placeholder="e.g., 75000" class="w-full p-3 bg-background-dark border border-primary/50 text-white rounded-lg focus:ring-primary focus:border-primary">
+                
+                <button type="submit" class="w-full flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary text-background-dark text-base font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 transition-all">
+                    <span class="truncate">FIND BEST GENERAL BUILD</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Results container -->
+        <div id="general-results"></div>
+    </div>
+
+    <!-- === VIEW: 2. Custom Build (Budget & Purpose) === -->
+    <div id="custom-builder" class="view-content hidden p-4 sm:p-6 space-y-8">
+        <h2 class="text-3xl font-bold text-white leading-tight tracking-[-0.033em] border-b border-primary/30 pb-4">
+            2. CUSTOM BUILD <span class="text-primary">(PURPOSE OPTIMIZED)</span>
+        </h2>
+        
+        <div class="bg-primary/10 p-6 rounded-lg border border-primary/30 shadow-xl" style="box-shadow: 0 0 10px rgba(244, 244, 37, 0.1);">
+            <p class="text-slate-300 mb-6">Optimize your rig for **Gaming** (prioritizes GPU) or **Productivity** (prioritizes CPU/RAM).</p>
+            
+            <form id="custom-build-form" onsubmit="event.preventDefault(); submitCustomBuild();" class="space-y-6">
+                
+                <label for="custom-purpose" class="block text-sm font-medium text-primary">PRIMARY PURPOSE</label>
+                <select id="custom-purpose" required class="w-full p-3 bg-background-dark border border-primary/50 text-white rounded-lg focus:ring-primary focus:border-primary">
+                    <option value="" class="text-slate-500">Select Purpose</option>
+                    <option value="gaming">Gaming</option>
+                    <option value="productivity">Productivity</option>
+                </select>
+
+                <label for="custom-budget" class="block text-sm font-medium text-primary">BUDGET (₹)</label>
+                <input type="number" id="custom-budget" required min="1000" placeholder="e.g., 110000" class="w-full p-3 bg-background-dark border border-primary/50 text-white rounded-lg focus:ring-primary focus:border-primary">
+                
+                <button type="submit" class="w-full flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary text-background-dark text-base font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 transition-all">
+                    <span class="truncate">FIND OPTIMIZED BUILD</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Results container -->
+        <div id="custom-results"></div>
+    </div>
+
+    <!-- === VIEW: 3. Community Builds (Static Showcase) === -->
+    <div id="community-builds" class="view-content hidden p-4 sm:p-6 space-y-8">
+        <h2 class="text-3xl font-bold text-white leading-tight tracking-[-0.033em] border-b border-primary/30 pb-4">
+            3. COMMUNITY BUILDS <span class="text-primary">(NETWORK SHOWCASE)</span>
+        </h2>
+        
+        <!-- Static Community Build Grid (Now with 13 builds) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
+
+            <!-- Community Build 1 -->
+            <div class="group relative flex flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-left transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <!-- Image Placeholder -->
+                <img src="images/pc_1.jpeg" alt="Community build neon serpent" class="w-full h-40 object-cover rounded-md border border-primary/30" onerror="this.src='https://placehold.co/600x400/231e0f/FAC638?text=Image+Not+Found'">
+                
+                <h3 class="text-white text-xl font-bold mt-2">"Neon Serpent"</h3>
+                <p class="text-slate-300 text-sm -mt-2">by <span class="text-primary font-medium">@RiftRunner</span></p>
+
+                <!-- Specs -->
+                <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                    <li><span class="text-primary/80 w-16 inline-block">CPU:</span> Intel Core i9-14900K</li>
+                    <li><span class="text-primary/80 w-16 inline-block">GPU:</span> NVIDIA RTX 4090</li>
+                    <li><span class="text-primary/80 w-16 inline-block">RAM:</span> 64GB DDR5-7200</li>
+                </ul>
+            </div>
+
+            <!-- Community Build 2 -->
+            <div class="group relative flex flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-left transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <!-- Image Placeholder -->
+                <img src="images/pc_2.jpeg" alt="Community build white ghost" class="w-full h-40 object-cover rounded-md border border-primary/30" onerror="this.src='https://placehold.co/600x400/231e0f/FAC638?text=Image+Not+Found'">
+                
+                <h3 class="text-white text-xl font-bold mt-2">"White Ghost"</h3>
+                <p class="text-slate-300 text-sm -mt-2">by <span class="text-primary font-medium">@ZeroCool</span></p>
+
+                <!-- Specs -->
+                <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                    <li><span class="text-primary/80 w-16 inline-block">CPU:</span> AMD Ryzen 7 7800X3D</li>
+                    <li><span class="text-primary/80 w-16 inline-block">GPU:</span> AMD Radeon RX 7900 XTX</li>
+                    <li><span class="text-primary/80 w-16 inline-block">RAM:</span> 32GB DDR5-6000</li>
+                </ul>
+            </div>
+            
+            <!-- Community Build 3 -->
+            <div class="group relative flex flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-left transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <!-- Image Placeholder -->
+                <img src="images/pc_3.jpeg" alt="Community build workstation" class="w-full h-40 object-cover rounded-md border border-primary/30" onerror="this.src='https://placehold.co/600x400/231e0f/FAC638?text=Image+Not+Found'">
+                
+                <h3 class="text-white text-xl font-bold mt-2">"The Render Farm"</h3>
+                <p class="text-slate-300 text-sm -mt-2">by <span class="text-primary font-medium">@Dr.Ada</span></p>
+
+                <!-- Specs -->
+                <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                    <li><span class="text-primary/80 w-16 inline-block">CPU:</span> AMD Threadripper 5955WX</li>
+                    <li><span class="text-primary/80 w-16 inline-block">GPU:</span> NVIDIA RTX 4070 Ti</li>
+                    <li><span class="text-primary/80 w-16 inline-block">RAM:</span> 128GB DDR4 ECC</li>
+                </ul>
+            </div>
+
+            <!-- NEW Build 4 -->
+            <div class="group relative flex flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-left transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <img src="images/pc_4.jpeg" alt="Community build Project Kusanagi" class="w-full h-40 object-cover rounded-md border border-primary/30" onerror="this.src='https://placehold.co/600x400/231e0f/FAC638?text=Image+Not+Found'">
+                <h3 class="text-white text-xl font-bold mt-2">"Project Kusanagi"</h3>
+                <p class="text-slate-300 text-sm -mt-2">by <span class="text-primary font-medium">@Major</span></p>
+                <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                    <li><span class="text-primary/80 w-16 inline-block">CPU:</span> Intel Core i5-13600K</li>
+                    <li><span class="text-primary/80 w-16 inline-block">GPU:</span> AMD RX 7800 XT</li>
+                    <li><span class="text-primary/80 w-16 inline-block">RAM:</span> 32GB DDR5-6000</li>
+                </ul>
+            </div>
+
+            <!-- NEW Build 5 -->
+            <div class="group relative flex flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-left transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <img src="images/pc_5.avif" alt="Community build ICEBreaker" class="w-full h-40 object-cover rounded-md border border-primary/30" onerror="this.src='https://placehold.co/600x400/231e0f/FAC638?text=Image+Not+Found'">
+                <h3 class="text-white text-xl font-bold mt-2">"ICEBreaker"</h3>
+                <p class="text-slate-300 text-sm -mt-2">by <span class="text-primary font-medium">@Netrunner</span></p>
+                <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                    <li><span class="text-primary/80 w-16 inline-block">CPU:</span> AMD Ryzen 5 5600X</li>
+                    <li><span class="text-primary/80 w-16 inline-block">GPU:</span> NVIDIA RTX 3060 Ti</li>
+                    <li><span class="text-primary/80 w-16 inline-block">RAM:</span> 32GB DDR4-3600</li>
+                </ul>
+            </div>
+
+            <!-- NEW Build 6 -->
+            <div class="group relative flex flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-left transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <img src="images/pc_6.jpg" alt="Community build Stealth Bomber" class="w-full h-40 object-cover rounded-md border border-primary/30" onerror="this.src='https://placehold.co/600x400/231e0f/FAC638?text=Image+Not+Found'">
+                <h3 class="text-white text-xl font-bold mt-2">"Stealth Bomber"</h3>
+                <p class="text-slate-300 text-sm -mt-2">by <span class="text-primary font-medium">@Nocturne</span></p>
+                <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                    <li><span class="text-primary/80 w-16 inline-block">CPU:</span> AMD Ryzen 7 5800X3D</li>
+                    <li><span class="text-primary/80 w-16 inline-block">GPU:</span> NVIDIA RTX 4070</li>
+                    <li><span class="text-primary/80 w-16 inline-block">RAM:</span> 32GB DDR4-3600</li>
+                </ul>
+            </div>
+
+            <!-- NEW Build 7 -->
+            <div class="group relative flex flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-left transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <img src="images/pc_7.jpg" alt="Community build Chrome Jaguar" class="w-full h-40 object-cover rounded-md border border-primary/30" onerror="this.src='https://placehold.co/600x400/231e0f/FAC638?text=Image+Not+Found'">
+                <h3 class="text-white text-xl font-bold mt-2">"Chrome Jaguar"</h3>
+                <p class="text-slate-300 text-sm -mt-2">by <span class="text-primary font-medium">@Fixer</span></p>
+                <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                    <li><span class="text-primary/80 w-16 inline-block">CPU:</span> Intel Core i7-14700K</li>
+                    <li><span class="text-primary/80 w-16 inline-block">GPU:</span> AMD RX 7900 XT</li>
+                    <li><span class="text-primary/80 w-16 inline-block">RAM:</span> 64GB DDR5-6400</li>
+                </ul>
+            </div>
+
+            <!-- NEW Build 8 -->
+            <div class="group relative flex flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-left transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <img src="images/pc_8.webp" alt="Community build Quantum Leap" class="w-full h-40 object-cover rounded-md border border-primary/30" onerror="this.src='https://placehold.co/600x400/231e0f/FAC638?text=Image+Not+Found'">
+                <h3 class="text-white text-xl font-bold mt-2">"Quantum Leap"</h3>
+                <p class="text-slate-300 text-sm -mt-2">by <span class="text-primary font-medium">@AltC</span></p>
+                <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                    <li><span class="text-primary/80 w-16 inline-block">CPU:</span> AMD Ryzen 9 7950X</li>
+                    <li><span class="text-primary/80 w-16 inline-block">GPU:</span> NVIDIA RTX 4080 Super</li>
+                    <li><span class="text-primary/80 w-16 inline-block">RAM:</span> 64GB DDR5-6000</li>
+                </ul>
+            </div>
+
+            <!-- NEW Build 9 -->
+            <div class="group relative flex flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-left transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <img src="images/pc_9.jpg" alt="Community build The Monolith" class="w-full h-40 object-cover rounded-md border border-primary/30" onerror="this.src='https://placehold.co/600x400/231e0f/FAC638?text=Image+Not+Found'">
+                <h3 class="text-white text-xl font-bold mt-2">"The Monolith"</h3>
+                <p class="text-slate-300 text-sm -mt-2">by <span class="text-primary font-medium">@Oracle</span></p>
+                <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                    <li><span class="text-primary/80 w-16 inline-block">CPU:</span> Intel Core i9-13900K</li>
+                    <li><span class="text-primary/80 w-16 inline-block">GPU:</span> NVIDIA RTX 4090</li>
+                    <li><span class="text-primary/80 w-16 inline-block">RAM:</span> 128GB DDR5-5600</li>
+                </ul>
+            </div>
+
+            <!-- NEW Build 10 -->
+            <div class="group relative flex flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-left transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <img src="images/pc_10.webp" alt="Community build Arcade Dream" class="w-full h-40 object-cover rounded-md border border-primary/30" onerror="this.src='https://placehold.co/600x400/231e0f/FAC638?text=Image+Not+Found'">
+                <h3 class="text-white text-xl font-bold mt-2">"Arcade Dream"</h3>
+                <p class="text-slate-300 text-sm -mt-2">by <span class="text-primary font-medium">@Retro</span></p>
+                <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                    <li><span class="text-primary/80 w-16 inline-block">CPU:</span> AMD Ryzen 5 5600G</li>
+                    <li><span class="text-primary/80 w-16 inline-block">GPU:</span> Integrated Vega 7</li>
+                    <li><span class="text-primary/80 w-16 inline-block">RAM:</span> 16GB DDR4-3200</li>
+                </ul>
+            </div>
+
+            <!-- NEW Build 11 -->
+            <div class="group relative flex flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-left transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <img src="images/pc_11.webp" alt="Community build Data Fortress" class="w-full h-40 object-cover rounded-md border border-primary/30" onerror="this.src='https://placehold.co/600x400/231e0f/FAC638?text=Image+Not+Found'">
+                <h3 class="text-white text-xl font-bold mt-2">"Data Fortress"</h3>
+                <p class="text-slate-300 text-sm -mt-2">by <span class="text-primary font-medium">@Sysop</span></p>
+                <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                    <li><span class="text-primary/80 w-16 inline-block">CPU:</span> AMD EPYC (Home Server)</li>
+                    <li><span class="text-primary/80 w-16 inline-block">GPU:</span> NVIDIA A2000</li>
+                    <li><span class="text-primary/80 w-16 inline-block">RAM:</span> 256GB ECC DDR4</li>
+                </ul>
+            </div>
+
+            <!-- NEW Build 12 -->
+            <div class="group relative flex flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-left transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <img src="images/pc_12.webp" alt="Community build Project Ghost" class="w-full h-40 object-cover rounded-md border border-primary/30" onerror="this.src='https://placehold.co/600x400/231e0f/FAC638?text=Image+Not+Found'">
+                <h3 class="text-white text-xl font-bold mt-2">"Project Ghost"</h3>
+                <p class="text-slate-300 text-sm -mt-2">by <span class="text-primary font-medium">@Tachikoma</span></p>
+                <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                    <li><span class="text-primary/80 w-16 inline-block">CPU:</span> Intel Core i5-12400F</li>
+                    <li><span class="text-primary/80 w-16 inline-block">GPU:</span> AMD RX 6600 XT</li>
+                    <li><span class="text-primary/80 w-16 inline-block">RAM:</span> 16GB DDR4-3200</li>
+                </ul>
+            </div>
+
+             <!-- NEW Build 13 -->
+             <div class="group relative flex flex-col gap-4 rounded-lg border border-primary/30 bg-primary/10 p-6 text-left transition-all hover:border-primary hover:bg-primary/20">
+                <div class="absolute inset-0 rounded-lg border border-primary opacity-0 transition-opacity group-hover:opacity-100" style="box-shadow: 0 0 15px 3px #f4f425;"></div>
+                <img src="images/pc_13.png" alt="Community build The Oracle" class="w-full h-40 object-cover rounded-md border border-primary/30" onerror="this.src='https://placehold.co/600x400/231e0f/FAC638?text=Image+Not+Found'">
+                <h3 class="text-white text-xl font-bold mt-2">"The Oracle"</h3>
+                <p class="text-slate-300 text-sm -mt-2">by <span class="text-primary font-medium">@Morpheus</span></p>
+                <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                    <li><span class="text-primary/80 w-16 inline-block">CPU:</span> AMD Ryzen 9 7900X</li>
+                    <li><span class="text-primary/80 w-16 inline-block">GPU:</span> NVIDIA RTX 4070 Super</li>
+                    <li><span class="text-primary/80 w-16 inline-block">RAM:</span> 64GB DDR5-6000</li>
+                </ul>
+            </div>
+            
+        </div>
+    </div>
+</div>
+<!-- === END Dynamic Content Container === -->
+
+<!-- Global Message/Modal Container (Stylized for the theme) -->
+<div id="message-container" class="fixed inset-0 bg-background-dark bg-opacity-90 hidden items-center justify-center p-4 z-50">
+    <div class="bg-background-dark p-8 rounded-xl border border-primary/50 shadow-2xl w-full max-w-sm space-y-6" style="box-shadow: 0 0 20px 5px rgba(244, 244, 37, 0.2);">
+        <h3 id="message-title" class="text-2xl font-bold text-primary border-b border-primary/50 pb-2"></h3>
+        <p id="message-content" class="text-slate-300"></p>
+        <button onclick="hideMessage()" class="w-full flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-background-dark text-sm font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 transition-all">
+            <span class="truncate">CLOSE</span>
+        </button>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="loading-overlay">
+    <div class="loader"></div>
+</div>
+
+</main>
+<footer class="flex flex-col gap-6 px-5 py-10 text-center @container border-t border-solid border-primary/20 mt-10">
+<div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 @[480px]:flex-row @[480px]:justify-around">
+<a class="text-slate-400 text-base font-normal leading-normal min-w-40 hover:text-primary transition-colors" href="#">About Us</a>
+<a class="text-slate-400 text-base font-normal leading-normal min-w-40 hover:text-primary transition-colors" href="#">Contact</a>
+</div>
+<div class="flex flex-wrap justify-center gap-4">
+<a class="text-slate-400 hover:text-primary transition-colors" href="#">
+<svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M22 4s-.7 2.1-2 3.4c1.6 1.4 2.8 3.2 2.8 5.5 0 3.1-2.2 5.4-5 5.4-3.7 0-5.3-2.5-5.3-5.4 0-3.2 1.4-5.4 5.1-5.4h.1c.3 0 .5.2.5.5s-.2.5-.5.5h-.1c-2.2 0-3.6 1.8-3.6 3.9 0 2.2 1.5 3.9 3.8 3.9 1.5 0 2.8-1.2 2.8-2.8 0-1.5-1.1-2.7-2.6-2.7-.9 0-1.5.5-1.5.5s-.3-1.6-1.1-2.5c-.8-.9-2.1-1.1-2.6-1.1-1.6 0-2.8 1.1-2.8 2.6 0 1.2.8 2.3 2 2.6-1.2 2.5-3.6 4.4-6.4 4.4-1.9 0-3.2-1.3-3.2-2.9 0-1.9 1.4-3.2 3.2-3.2 1.1 0 1.9.5 2.2 1.1.3-.6.6-1.1 1.1-1.1.6 0 1.1.5 1.1 1.1 0 .6-.5 1.1-1.1 1.1-.3 0-.5-.2-.5-.5s.2-.5.5-.5c.2 0 .3.1.3.3v.1c0 .7-1 1.4-2.1 1.4-1.6 0-2.8-1.3-2.8-2.9 0-1.9 1.4-3.2 3.2-3.2 1.9 0 3.3 1.3 3.3 2.9 0 .8-.3 1.5-.8 2.1 1.1-1.2 1.8-2.8 1.8-4.4 0-3.5-2.8-6.4-6.4-6.4-3.5 0-6.4 2.8-6.4 6.4 0 3.5 2.8 6.4 6.4 6.4 2.2 0 4.1-1.1 5.2-2.8.1.3.2.6.2.9 0 1.9-1.5 3.4-3.4 3.4s-3.4-1.5-3.4-3.4c0-1.9 1.5-3.4 3.4-3.4.1 0 .3 0 .4.1.2-1.8 1.8-3.2 3.7-3.2 2.1 0 3.7 1.7 3.7 3.7 0 2.1-1.7 3.7-3.7 3.7-1.4 0-2.6-1.2-2.6-2.6 0-.6.2-1.1.5-1.5-.2-.1-.5-.2-.7-.2-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2c0-1.8-1.5-3.2-3.2-3.2s-3.2 1.5-3.2 3.2c0 1.8 1.5 3.2 3.2 3.2.9 0 1.6-.4 2.2-1 .6.6 1.4 1 2.2 1 1.8 0 3.2-1.5 3.2-3.2 0-1.8-1.5-3.2-3.2-3.2-1.1 0-2.1.6-2.6 1.4-.4-.9-1.4-1.4-2.6-1.4-1.8 0-3.2 1.5-3.2 3.2 0 1.8 1.5 3.2 3.2 3.2 1.1 0 2.1-.6 2.6-1.4.4.9 1.4 1.4 2.6 1.4 1.8 0 3.2-1.5 3.2-3.2s-1.5-3.2-3.2-3.2z"></path>
+</svg>
+</a>
+<a class="text-slate-400 hover:text-primary transition-colors" href="#">
+<svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<rect height="20" rx="5" ry="5" width="20" x="2" y="2"></rect>
+<path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+<line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
+</svg>
+</a>
+<a class="text-slate-400 hover:text-primary transition-colors" href="#">
+<svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10.29 2.86a3.8 3.8 0 0 1 3.42 0 3.8 3.8 0 0 1 1.93 3.09A3.8 3.8 0 0 1 14.82 9a3.8 3.8 0 0 1-1.3 2.45 5.4 5.4 0 0 1-2.02 1.45 5.4 5.4 0 0 1-3.1 0 5.4 5.4 0 0 1-2.02-1.45A3.8 3.8 0 0 1 5.08 9a3.8 3.8 0 0 1 .82-3.05A3.8 3.8 0 0 1 7.84 3.1a3.8 3.8 0 0 1 2.45-.24Z"></path>
+<path d="m9.18 12.3-1.82 3.2a2.4 2.4 0 0 0 .34 2.42 2.4 2.4 0 0 0 2.42.34l3.2-1.82a2.4 2.4 0 0 0 1.2-2.12V14a2.4 2.4 0 0 0-2.4-2.4H9.18Z"></path>
+<path d="m14.82 12.3 1.82 3.2a2.4 2.4 0 0 1-.34 2.42 2.4 2.4 0 0 1-2.42.34l-3.2-1.82a2.4 2.4 0 0 1-1.2-2.12V14a2.4 2.4 0 0 1 2.4-2.4h2.54Z"></path>
+</svg>
+</a>
+</div>
+<p class="text-slate-400 text-base font-normal leading-normal">© 2025 PCX  . All rights reserved.</p>
+</footer>
+</div>
+</div>
+</div>
+<!-- Application Logic (Frontend JS) -->
+<script>
+    // --- Utility Functions ---
+
+    /**
+     * Shows a custom message modal instead of alert().
+     */
+    function showMessage(title, content, isError = true) {
+        document.getElementById('message-title').textContent = title;
+        document.getElementById('message-content').textContent = content;
+        
+        // Error styling
+        const titleElement = document.getElementById('message-title');
+        titleElement.classList.toggle('text-primary', !isError);
+        titleElement.classList.toggle('text-red-500', isError);
+
+        document.getElementById('message-container').classList.remove('hidden');
+        document.getElementById('message-container').classList.add('flex');
+    }
+
+    /**
+     * Hides the custom message modal.
+     */
+    function hideMessage() {
+        document.getElementById('message-container').classList.add('hidden');
+        document.getElementById('message-container').classList.remove('flex');
+    }
+
+    /**
+     * Handles dynamic page/view switching (SPA navigation).
+     */
+    function showView(viewId) {
+        // Hide all views
+        document.querySelectorAll('.view-content').forEach(view => {
+            view.classList.add('hidden');
+            view.classList.remove('active-view');
+        });
+        
+        // Show the selected view
+        const activeView = document.getElementById(viewId);
+        if (activeView) {
+            activeView.classList.remove('hidden');
+            activeView.classList.add('active-view');
+        }
+
+        // Update navigation active state
+        document.querySelectorAll('.nav-link').forEach(btn => {
+            btn.classList.remove('active-nav');
+            if (btn.getAttribute('data-view') === viewId) {
+                btn.classList.add('active-nav');
+            }
+        });
+
+        // Toggle home card visibility based on view
+        const homeCardsContainer = document.querySelector('.grid-cols-1.md\\:grid-cols-3.gap-6.p-4');
+        if (homeCardsContainer) {
+            homeCardsContainer.style.display = viewId === 'home' ? 'grid' : 'none';
+        }
+        
+        const exploreButton = document.querySelector('.flex.px-4.py-12.justify-center');
+        if (exploreButton) {
+            exploreButton.style.display = viewId === 'home' ? 'flex' : 'none';
+        }
+    }
+    
+    // Show home view on load
+    window.addEventListener('load', () => showView('home'));
+
+    /**
+     * Formats a number as INR currency string.
+     */
+    function formatINR(number) {
+        return `₹${number.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    }
+
+    /**
+     * Generates the HTML for the stylized build result card.
+     */
+    function renderBuildResult(build, remainingBudget) {
+        const componentsHtml = Object.entries(build.components).map(([component, part]) => `
+            <div class="component-list-item">
+                <span class="font-medium text-slate-300">${component}</span>
+                <span class="text-primary font-semibold">${part}</span>
+            </div>
+        `).join('');
+
+        const purposeText = build.purpose.toUpperCase();
+
+        return `
+            <div class="bg-primary/10 p-6 rounded-lg border border-primary/30 shadow-xl space-y-4 mt-6" style="box-shadow: 0 0 15px 3px rgba(244, 244, 37, 0.2);">
+                <div class="flex items-center space-x-3 border-b border-primary/30 pb-3">
+                    <span class="material-symbols-outlined text-primary !text-4xl">check_circle</span>
+                    <div>
+                        <h3 class="text-2xl font-bold text-white">${build.name}</h3>
+                        <p class="text-sm text-slate-400">OPTIMIZED FOR: ${purposeText}</p>
+                    </div>
+                </div>
+
+                <div class="bg-background-dark p-4 rounded-lg flex justify-between items-center border border-primary/50">
+                    <span class="text-lg font-bold text-slate-300">ESTIMATED PRICE:</span>
+                    <span class="text-3xl font-extrabold text-primary">${formatINR(build.price)}</span>
+                </div>
+
+                <h4 class="text-xl font-semibold text-primary pt-2 mt-4">COMPONENTS MANIFEST:</h4>
+                <div class="space-y-2 max-h-80 overflow-y-auto pr-2">
+                    ${componentsHtml}
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-primary/30 border-dashed flex justify-between items-center">
+                    <span class="text-md font-semibold text-slate-300">Remaining Budget:</span>
+                    <span class="text-xl font-bold text-primary">${formatINR(remainingBudget)}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Core function to send data to the Python backend API.
+     */
+    async function fetchBuild(budget, purpose, resultsDivId) {
+        const resultsDiv = document.getElementById(resultsDivId);
+        const loadingOverlay = document.getElementById('loading-overlay');
+        
+        resultsDiv.innerHTML = '';
+        loadingOverlay.style.display = 'flex';
+
+        try {
+            const response = await fetch('/api/get_build', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ budget, purpose })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Build found, render the results
+                resultsDiv.innerHTML = renderBuildResult(data.build, data.remaining_budget);
+            } else {
+                // No build found, show the message from the Python server
+                showMessage('NO BUILD FOUND', data.message);
+            }
+
+        } catch (error) {
+            console.error('Fetch error:', error);
+            showMessage('SERVER ERROR', 'Could not connect to the Python server or process the request.');
+        } finally {
+            loadingOverlay.style.display = 'none';
+        }
+    }
+
+    // --- Submission Handlers (Now calling the Python backend) ---
+
+    function submitGeneralBuild() {
+        const budgetInput = document.getElementById('general-budget');
+        const budget = parseInt(budgetInput.value);
+
+        if (isNaN(budget) || budget <= 0) {
+            showMessage('INPUT ERROR', 'Please enter a valid, positive budget.', true);
+            return;
+        }
+
+        fetchBuild(budget, 'general', 'general-results');
+    }
+
+    function submitCustomBuild() {
+        const budgetInput = document.getElementById('custom-budget');
+        const purposeInput = document.getElementById('custom-purpose');
+        
+        const budget = parseInt(budgetInput.value);
+        const purpose = purposeInput.value;
+
+        if (!purpose) {
+             showMessage('INPUT ERROR', 'Please select a primary purpose (Gaming or Productivity).', true);
+             return;
+        }
+
+        if (isNaN(budget) || budget <= 0) {
+            showMessage('INPUT ERROR', 'Please enter a valid, positive budget.', true);
+            return;
+        }
+
+        fetchBuild(budget, purpose, 'custom-results');
+    }
+
+    // Expose functions globally for HTML access
+    window.showView = showView;
+    window.hideMessage = hideMessage;
+    window.submitGeneralBuild = submitGeneralBuild;
+    window.submitCustomBuild = submitCustomBuild;
+
+    // --- NEW FUNCTION TO UPDATE THE DATABASE ---
+    
+    /**
+     * Calls the new backend endpoint to fetch a build from Gemini
+     * and add it to the server's in-memory list.
+     */
+    async function updateBuildDatabase() {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const updateButton = document.getElementById('update-builds-btn');
+        
+        loadingOverlay.style.display = 'flex';
+        if (updateButton) updateButton.disabled = true;
+
+        try {
+            const response = await fetch('/api/update_builds', {
+                method: 'POST'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Show a success message (false for success)
+                showMessage('DATABASE UPDATED', data.message, false); 
+            } else {
+                // Show an error message (true for error)
+                showMessage('UPDATE FAILED', data.message, true); 
+            }
+
+        } catch (error) {
+            console.error('Fetch error:', error);
+            showMessage('SERVER ERROR', 'Could not connect to the Python server to update builds.');
+        } finally {
+            loadingOverlay.style.display = 'none';
+            if (updateButton) updateButton.disabled = false;
+        }
+    }
+    window.updateBuildDatabase = updateBuildDatabase; // Expose globally
+
+</script>
+</body>
+</html>
